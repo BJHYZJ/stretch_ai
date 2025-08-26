@@ -90,7 +90,7 @@ setuptools.setup(
         "pyttsx3",  # offline TTS engine. TODO: There are better options, such as "tts_models/en/ljspeech/fast_pitch" from https://github.com/coqui-ai/TTS
         "simpleaudio",  # playback audio
         "sounddevice",  # Suppresses ALSA warnings when launching PyAudio
-        "wave",
+        # "wave",
         # These are not supported in python 3.12
         "scikit-fmm",
         "open3d",
