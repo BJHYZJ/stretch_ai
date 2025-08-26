@@ -17,7 +17,7 @@ import mujoco.viewer
 import numpy as np
 import robosuite
 from robocasa.models.scenes.scene_registry import StyleType
-from robosuite import load_controller_config
+from robosuite.controllers import load_composite_controller_config
 from stretch_mujoco import StretchMujocoSimulator
 from stretch_mujoco.utils import (
     get_absolute_path_stretch_xml,
@@ -156,7 +156,7 @@ def model_generation_wizard(
     config = {
         "env_name": task,
         "robots": "PandaMobile",
-        "controller_configs": load_controller_config(default_controller="OSC_POSE"),
+        "controller_configs": load_composite_controller_config(default_controller="OSC_POSE"),
         "translucent_robot": False,
         "layout_and_style_ids": [[layout, style]],
     }

@@ -185,12 +185,18 @@ class MujocoZmqServer(BaseZmqServer):
         # They should probably stay in stretch mujoco
         if scene_path is None:
             scene_path = sim_utils.get_default_scene_path()
+        # Import StretchCameras here to avoid circular imports
+        from stretch_mujoco.enums.stretch_cameras import StretchCameras
+        
+        # Enable all cameras by default for the simulation
+        cameras_to_use = StretchCameras.all()
+        
         if scene_model is not None:
             if scene_path is not None:
                 logger.warning("Both scene model and scene path provided. Using scene model.")
-            self.robot_sim = StretchMujocoSimulator(model=scene_model)
+            self.robot_sim = StretchMujocoSimulator(model=scene_model, cameras_to_use=cameras_to_use)
         else:
-            self.robot_sim = StretchMujocoSimulator(scene_xml_path=scene_path)
+            self.robot_sim = StretchMujocoSimulator(scene_xml_path=scene_path, cameras_to_use=cameras_to_use)
         self.simulation_rate = simulation_rate
         self.objects_info = objects_info
 
@@ -510,7 +516,7 @@ class MujocoZmqServer(BaseZmqServer):
 
         while self.is_running():
             self._camera_data = self.robot_sim.pull_camera_data()
-            self._status = self.robot_sim._pull_status()
+            self._status = self.robot_sim.pull_status()
             time.sleep(1 / self.simulation_rate)
 
     @override
