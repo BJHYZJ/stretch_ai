@@ -31,7 +31,7 @@ from stretch.navigation.utils.geometry import transformation_matrix_to_pose
 
 class OrbSlam3(Node):
 
-    use_pangolin_viewer: bool = False
+    use_pangolin_viewer: bool = True
 
     def __init__(self):
         super().__init__("stretch_orbslam3")

@@ -21,6 +21,7 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
+        ('share/' + package_name + '/rviz', glob('rviz/*')),
         (
             os.path.join("share", package_name, "launch"),
             glob(os.path.join("launch", "*launch.[pxy][yma]*")),
@@ -45,6 +46,7 @@ setup(
             "goto_controller = yanzj_ros2_bridge.nodes.goto_controller:main",
             "odom_tf_publisher = yanzj_ros2_bridge.nodes.odom_tf_publisher:main",
             "orbslam3 = yanzj_ros2_bridge.nodes.orbslam3:main",
+            'd435i_accel_correction = yanzj_ros2_bridge.nodes.d435i_accel_correction:main',
             "server = yanzj_ros2_bridge.remote.server:main",
             "server_no_d405 = yanzj_ros2_bridge.remote.server_no_d405:main",
         ],
