@@ -27,7 +27,7 @@ configurable_parameters = [{'name': 'camera_namespace',             'default': '
                            {'name': 'infra_rgb',                    'default': 'false', 'description': 'enable infra2 stream'},
                            {'name': 'enable_confidence',            'default': 'false', 'description': 'enable depth stream'},
                            {'name': 'gyro_fps',                     'default': '200', 'description': "''"},
-                           {'name': 'accel_fps',                    'default': '63', 'description': "''"},
+                           {'name': 'accel_fps',                    'default': '100', 'description': "''"},
                            {'name': 'enable_gyro',                  'default': 'true', 'description': "''"},
                            {'name': 'enable_accel',                 'default': 'true', 'description': "''"},
                            {'name': 'pointcloud.enable',            'default': 'true', 'description': ''},

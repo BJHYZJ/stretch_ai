@@ -30,6 +30,10 @@ setup(
             os.path.join("share", package_name, "config"),
             glob(os.path.join("config", "*")),
         ),
+        (
+            os.path.join("share", package_name, "urdf"),
+            glob(os.path.join("urdf", "*.urdf")),
+        ),
     ],
     install_requires=["setuptools", "stretch"],
     zip_safe=True,
@@ -49,6 +53,8 @@ setup(
             'd435i_accel_correction = yanzj_ros2_bridge.nodes.d435i_accel_correction:main',
             "server = yanzj_ros2_bridge.remote.server:main",
             "server_no_d405 = yanzj_ros2_bridge.remote.server_no_d405:main",
+            "urdf_loader = yanzj_ros2_bridge.urdf_loader:main",
+            "joint_state_aggregator = yanzj_ros2_bridge.joint_state_aggregator:main",
         ],
     },
 )
