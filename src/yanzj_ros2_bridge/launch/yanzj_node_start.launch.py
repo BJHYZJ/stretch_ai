@@ -1,9 +1,3 @@
-# Requirements:
-#   A realsense D435i
-#   Install realsense2 ros2 package (ros-$ROS_DISTRO-realsense2-camera)
-# Example:
-#   $ ros2 launch rtabmap_examples realsense_d435i_color.launch.py
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -42,7 +36,8 @@ def launch_setup(context, *args, **kwargs):
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 os.path.join(
-                    get_package_share_directory('xarm_api'), 
+                    # get_package_share_directory('xarm_api'), 
+                    yanzj_ros2_bridge_path,
                     'launch', 
                     "xarm6_driver.launch.py"
                 )
@@ -53,6 +48,25 @@ def launch_setup(context, *args, **kwargs):
             }.items(),
         ),  
     ])
+
+
+    camera_launch = LaunchDescription([
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                yanzj_ros2_bridge_path, 
+                '/launch/d435i_high_resolution.launch.py'])),  
+    ])
+
+    lidar_launch = LaunchDescription([
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                # get_package_share_directory('livox_ros_driver2'), 
+                # '/launch_ROS2/msg_MID360_launch.py'])),  
+                yanzj_ros2_bridge_path, 
+                '/launch/livox_mid360_driver.launch.py'])),  
+    ])
+
+
     if simple_urdf:
         urdf_file_path = os.path.join(yanzj_ros2_bridge_path, 'urdf', "rangerminiv3_with_xarm6_simple.urdf")
     else:
@@ -74,22 +88,6 @@ def launch_setup(context, *args, **kwargs):
         }]
     )
 
-    camera_launch = LaunchDescription([
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([
-                yanzj_ros2_bridge_path, 
-                '/launch/d435i_high_resolution.launch.py'])),  
-    ])
-
-    lidar_launch = LaunchDescription([
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([
-                # get_package_share_directory('livox_ros_driver2'), 
-                # '/launch_ROS2/msg_MID360_launch.py'])),  
-                yanzj_ros2_bridge_path, 
-                '/launch/livox_mid360_driver.launch.py'])),  
-    ])
-
     # Joint state publisher that aggregates both robots' joint states
     joint_state_publisher_node = Node(
         package='joint_state_publisher',
@@ -100,6 +98,7 @@ def launch_setup(context, *args, **kwargs):
             'source_list': ['/ranger/joint_states', '/xarm/joint_states']
         }]
     )
+
 
     # Static transform from camera to end effector
     static_tf_camera_to_eef = Node(
@@ -138,7 +137,7 @@ def launch_setup(context, *args, **kwargs):
         ranger_launch,
         robot_state_publisher_node,
         joint_state_publisher_node,
-        rviz_node,
+        # rviz_node,
     ]
 
 def generate_launch_description():
