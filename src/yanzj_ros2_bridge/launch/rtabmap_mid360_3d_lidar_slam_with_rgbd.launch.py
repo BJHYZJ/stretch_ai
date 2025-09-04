@@ -36,7 +36,7 @@ def generate_launch_description():
         'subscribe_rgbd': use_camera,
         'subscribe_scan_cloud': True,
         'use_action_for_goal': True,
-        'odom_sensor_sync': True,  # 关闭严格时间同步
+        'odom_sensor_sync': True,
         # RTAB-Map's parameters should be strings:
         'Mem/NotLinkedNodesKept': 'false',
         'Grid/RangeMin': '0.5',  # ignore laser scan points on the robot itself
