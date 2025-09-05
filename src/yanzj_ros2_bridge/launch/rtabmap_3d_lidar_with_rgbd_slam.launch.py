@@ -1,6 +1,5 @@
 # Copy from: https://github.com/introlab/rtabmap_ros/blob/ros2/rtabmap_examples/launch/lidar3d.launch.py
 
-
 # Description:
 #   In this example, we keep only minimal data to do LiDAR SLAM.
 #
@@ -26,6 +25,7 @@ from launch import LaunchDescription, LaunchContext
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch.conditions import IfCondition, UnlessCondition
 
 def launch_setup(context: LaunchContext, *args, **kwargs):
   
@@ -34,11 +34,13 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   imu_topic = LaunchConfiguration('imu_topic')
   imu_used =  imu_topic.perform(context) != ''
   
-  rgbd_image_topic = LaunchConfiguration('rgbd_image_topic')
-  rgbd_images_topic = LaunchConfiguration('rgbd_images_topic')
-  rgbd_image_used =  rgbd_image_topic.perform(context) != '' or rgbd_images_topic.perform(context) != ''
-  rgbd_cameras = 0 if rgbd_images_topic.perform(context) != '' else 1
+  use_camera = LaunchConfiguration('use_camera')
+  robot_ns = LaunchConfiguration('robot_ns')
   
+  rgb_image_topic = LaunchConfiguration('rgb_image_topic')
+  rgb_camera_info_topic = LaunchConfiguration('rgb_camera_info_topic')
+  depth_image_topic = LaunchConfiguration('depth_image_topic')
+
   voxel_size = LaunchConfiguration('voxel_size')
   voxel_size_value = float(voxel_size.perform(context))
   
@@ -73,7 +75,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'use_sim_time': use_sim_time,
     'frame_id': frame_id,
     'qos': LaunchConfiguration('qos'),
-    'approx_sync': rgbd_image_used,
+    'approx_sync': use_camera,  # TODO set True when use RGBD
     'wait_for_transform': 0.2,
     # RTAB-Map's internal parameters are strings:
     'Icp/PointToPlane': 'true',
@@ -107,16 +109,18 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   rtabmap_parameters = {
     'subscribe_depth': False,
     'subscribe_rgb': False,
+    'subscribe_rgbd': use_camera,
     'subscribe_odom_info': True,
     'subscribe_scan_cloud': True,
     'map_frame_id': 'new_map',
     'odom_sensor_sync': True, # This will adjust camera position based on difference between lidar and camera stamps.
     # RTAB-Map's internal parameters are strings:
     'RGBD/ProximityMaxGraphDepth': '0',
-    'RGBD/ProximityPathMaxNeighbors': '1',
+    'RGBD/ProximityPathMaxNeighbors': '0.1',
     'RGBD/AngularUpdate': '0.05',
     'RGBD/LinearUpdate': '0.05',
-    'RGBD/CreateOccupancyGrid': 'false',
+    'RGBD/CreateOccupancyGrid': 'false',  # TODO, 默认为false
+    'RGBD/ForceOdom3DoF': 'true',        # 默认: true - 强制3自由度里程计。false=允许6DoF，更适应震动环境
     'Mem/NotLinkedNodesKept': 'false',
     'Mem/STMSize': '30',
     'Reg/Strategy': '1',
@@ -132,52 +136,87 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   
   remappings = [('odom', 'icp_odom')]
   if imu_used:
-    remappings.append(('imu', LaunchConfiguration('imu_topic')))
+    remappings.append(('imu', 'imu/data'))  # notic namespace problem
   else:
     remappings.append(('imu', 'imu_not_used'))
-  if rgbd_image_used:
-    if rgbd_cameras == 1:
-      remappings.append(('rgbd_image', LaunchConfiguration('rgbd_image_topic')))
-    else:
-      remappings.append(('rgbd_images', LaunchConfiguration('rgbd_images_topic')))
+  
+  # Add camera remappings only when use_camera is true
+  use_camera_value = use_camera.perform(context)
+  if use_camera_value == 'true':
+    # Assert that camera topics are properly configured
+    rgb_topic_value = rgb_image_topic.perform(context)
+    rgb_info_value = rgb_camera_info_topic.perform(context)
+    depth_topic_value = depth_image_topic.perform(context)
+    
+    assert rgb_topic_value, "RGB image topic must be specified when use_camera=true"
+    assert rgb_info_value, "RGB camera info topic must be specified when use_camera=true"
+    assert depth_topic_value, "Depth image topic must be specified when use_camera=true"
+    
+    remappings.append(('rgb/image', rgb_image_topic))
+    remappings.append(('rgb/camera_info', rgb_camera_info_topic))
+    remappings.append(('depth/image', depth_image_topic))
   
   nodes = [
     Node(
+      condition=IfCondition(use_camera),
+      package='rtabmap_sync', executable='rgbd_sync', output='screen',
+      namespace=robot_ns,
+      parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
+      remappings=remappings),
+
+    Node(
       package='rtabmap_odom', executable='icp_odometry', output='screen',
+      namespace=robot_ns,
       parameters=[shared_parameters, icp_odometry_parameters],
       remappings=remappings + [('scan_cloud', lidar_topic_deskewed)]),
     
     Node(
       package='rtabmap_slam', executable='rtabmap', output='screen',
+      namespace=robot_ns,
       parameters=[shared_parameters, rtabmap_parameters, 
-                  {'subscribe_rgbd': rgbd_image_used, 
-                   'rgbd_cameras': rgbd_cameras}],
+                  {'rgbd_cameras': 1}],
       remappings=remappings + [('scan_cloud', lidar_topic_deskewed)],
       arguments=arguments), 
   
     Node(
       package='rtabmap_viz', executable='rtabmap_viz', output='screen',
+      namespace=robot_ns,
       parameters=[shared_parameters, rtabmap_parameters],
       remappings=remappings + [('scan_cloud', 'odom_filtered_input_scan')])
   ]
-  
+
+  print(imu_used)
+  if imu_used:
+    nodes.append(
+      Node(
+        package='imu_filter_madgwick', executable='imu_filter_madgwick_node', output='screen',
+        namespace=robot_ns,
+        parameters=[{'use_mag': False, 
+                      'world_frame':'enu', 
+                      'publish_tf':False}],
+        remappings=[('imu/data_raw', imu_topic)]))
+
   if fixed_frame_from_imu:
     # Create a stabilized base frame based on imu for lidar deskewing
     nodes.append(
       Node(
         package='rtabmap_util', executable='imu_to_tf', output='screen',
+        namespace=robot_ns,
         parameters=[{
           'use_sim_time': use_sim_time,
           'fixed_frame_id': fixed_frame_id,
           'base_frame_id': frame_id,
           'wait_for_transform_duration': 0.001}],
-        remappings=[('imu/data', imu_topic)]))
+        # remappings=[('imu/data', imu_topic)]
+      )
+    )
 
   if fixed_frame_id and deskewing:
     # Lidar deskewing
     nodes.append(
       Node(
         package='rtabmap_util', executable='lidar_deskewing', output='screen',
+        namespace=robot_ns,
         parameters=[{
           'use_sim_time': use_sim_time,
           'fixed_frame_id': fixed_frame_id,
@@ -203,7 +242,7 @@ def generate_launch_description():
       description='Enable lidar deskewing.'),
     
     DeclareLaunchArgument(
-      'frame_id', default_value='velodyne',
+      'frame_id', default_value='base_link',
       description='Base frame of the robot.'),
     
     DeclareLaunchArgument(
@@ -215,21 +254,33 @@ def generate_launch_description():
       description='Localization mode.'),
 
     DeclareLaunchArgument(
-      'lidar_topic', default_value='/velodyne_points',
+      'lidar_topic', default_value='/livox/lidar',
       description='Name of the lidar PointCloud2 topic.'),
 
     DeclareLaunchArgument(
-      'imu_topic', default_value='',
+      'imu_topic', default_value='/livox/imu',
       description='IMU topic (ignored if empty).'),
     
     DeclareLaunchArgument(
-      'rgbd_image_topic', default_value='',
-      description='RGBD image topic (ignored if empty). Would be the output of a rtabmap_sync\'s rgbd_sync, stereo_sync or rgb_sync node.'),
-    
+      'use_camera', default_value='true',
+      description='Use camera for global loop closure / re-localization.'),
+
     DeclareLaunchArgument(
-      'rgbd_images_topic', default_value='',
-      description='RGBD images topic (ignored if empty, override "rgbd_image_topic" if set). Would be the output of a rtabmap_sync\'s rgbdx_sync node.'),
-    
+      'robot_ns', default_value='rtabmap_ranger_xarm',
+      description='Robot namespace.'),
+
+    DeclareLaunchArgument(
+      'rgb_image_topic', default_value='/camera/color/image_raw',
+      description='RGB image topic.'),
+
+    DeclareLaunchArgument(
+      'rgb_camera_info_topic', default_value='/camera/color/camera_info',
+      description='RGB camera info topic.'),
+
+    DeclareLaunchArgument(
+      'depth_image_topic', default_value='/camera/aligned_depth_to_color/image_raw',
+      description='Depth image topic.'),
+
     DeclareLaunchArgument(
       'expected_update_rate', default_value='15.0',
       description='Expected lidar frame rate. Ideally, set it slightly higher than actual frame rate, like 15 Hz for 10 Hz lidar scans.'),

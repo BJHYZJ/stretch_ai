@@ -19,12 +19,13 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time')
     localization = LaunchConfiguration('localization')
+    robot_ns = LaunchConfiguration('robot_ns')
     use_camera = LaunchConfiguration('use_camera')
 
     # ICP odometry parameters
     icp_odom_parameters = {
         'odom_frame_id': 'icp_odom',
-        'guess_frame_id': 'base_link',  # 使用base_link作为参考坐标系
+        'guess_frame_id': 'base_link',
         'OdomF2M/ScanSubtractRadius': '0.1',  # match voxel size
         'OdomF2M/ScanMaxSize': '15000'
     }
@@ -79,26 +80,31 @@ def generate_launch_description():
         # Launch arguments
         DeclareLaunchArgument(
             'use_sim_time', default_value='false', choices=['true', 'false'],
-            description='Use simulation clock if true'),
+            description='Use simulation (Gazebo) clock if true'),
 
         DeclareLaunchArgument(
             'localization', default_value='false', choices=['true', 'false'],
             description='Launch rtabmap in localization mode (a map should have been already created).'),
 
         DeclareLaunchArgument(
+            'robot_ns', default_value='ranger_xarm',
+            description='Robot namespace.'),
+
+        DeclareLaunchArgument(
             'use_camera', default_value='true',
             description='Use camera for global loop closure / re-localization.'),
 
-        # RGB-D synchronization node
+        # Nodes to launch
         Node(
             condition=IfCondition(use_camera),
             package='rtabmap_sync', executable='rgbd_sync', output='screen',
-            parameters=[{'approx_sync': True, 'use_sim_time': use_sim_time, 'queue_size': 10}],  # 改为宽松同步
+            namespace=robot_ns,
+            parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
             remappings=remappings),
 
-        # ICP odometry node
         Node(
             package='rtabmap_odom', executable='icp_odometry', output='screen',
+            namespace=robot_ns,
             parameters=[icp_odom_parameters, shared_parameters],
             remappings=remappings,
             arguments=["--ros-args", "--log-level", 'warn']),
@@ -107,6 +113,7 @@ def generate_launch_description():
         Node(
             condition=UnlessCondition(localization),
             package='rtabmap_slam', executable='rtabmap', output='screen',
+            namespace=robot_ns,
             parameters=[rtabmap_parameters, shared_parameters],
             remappings=remappings,
             arguments=['-d']),
@@ -115,16 +122,15 @@ def generate_launch_description():
         Node(
             condition=IfCondition(localization),
             package='rtabmap_slam', executable='rtabmap', output='screen',
+            namespace=robot_ns,
             parameters=[rtabmap_parameters, shared_parameters,
-                {'Mem/IncrementalMemory': 'False',
-                 'Mem/InitWMWithAllNodes': 'True'}],
+              {'Mem/IncrementalMemory':'False',
+               'Mem/InitWMWithAllNodes':'True'}],
             remappings=remappings),
 
-        # Visualization node
         Node(
             package='rtabmap_viz', executable='rtabmap_viz', output='screen',
+            namespace=robot_ns,
             parameters=[rtabmap_parameters, shared_parameters],
             remappings=remappings),
     ])
-
-    

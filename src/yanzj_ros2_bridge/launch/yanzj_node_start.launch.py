@@ -67,7 +67,7 @@ def launch_setup(context, *args, **kwargs):
     ])
 
 
-    if simple_urdf:
+    if simple_urdf == 'true':
         urdf_file_path = os.path.join(yanzj_ros2_bridge_path, 'urdf', "rangerminiv3_with_xarm6_simple.urdf")
     else:
         urdf_file_path = os.path.join(yanzj_ros2_bridge_path, 'urdf', "rangerminiv3_with_xarm6.urdf")
