@@ -23,9 +23,11 @@
 
 from launch import LaunchDescription, LaunchContext
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch.conditions import IfCondition, UnlessCondition
+from ament_index_python.packages import get_package_share_directory
+import os
 
 def launch_setup(context: LaunchContext, *args, **kwargs):
   
@@ -46,27 +48,12 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   
   use_sim_time = LaunchConfiguration('use_sim_time')
   
-  lidar_topic = LaunchConfiguration('lidar_topic')
-  lidar_topic_value = lidar_topic.perform(context)
-  lidar_topic_deskewed = lidar_topic_value + "/deskewed"
+  # Use FAST-LIO2's output point cloud which is already registered and in odom frame
+  fast_lio_cloud_topic = LaunchConfiguration('fast_lio_cloud_topic')
+  lidar_topic_deskewed = fast_lio_cloud_topic.perform(context)
   
   localization = LaunchConfiguration('localization').perform(context)
   localization = localization == 'true' or localization == 'True'
-  
-  deskewing = LaunchConfiguration('deskewing').perform(context)
-  deskewing = deskewing == 'true' or deskewing == 'True'
-  
-  deskewing_slerp = LaunchConfiguration('deskewing_slerp').perform(context)
-  deskewing_slerp = deskewing_slerp == 'true' or deskewing_slerp == 'True'
-  
-  fixed_frame_from_imu = False
-  fixed_frame_id =  LaunchConfiguration('fixed_frame_id').perform(context)
-  if not fixed_frame_id and imu_used:
-    fixed_frame_from_imu = True
-    fixed_frame_id = frame_id.perform(context) + "_stabilized"
-  
-  if not fixed_frame_id or not deskewing:
-    lidar_topic_deskewed = lidar_topic
   
   # Rule of thumb:
   max_correspondence_distance = voxel_size_value * 10.0
@@ -89,22 +76,6 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'Icp/Strategy': '1',
     'Icp/OutlierRatio': '0.7',
   }
-  
-  icp_odometry_parameters = {
-    'expected_update_rate': LaunchConfiguration('expected_update_rate'),
-    'deskewing': not fixed_frame_id and deskewing, # If fixed_frame_id is set, we do deskewing externally below
-    'odom_frame_id': 'icp_odom',
-    'guess_frame_id': fixed_frame_id,
-    'deskewing_slerp': deskewing_slerp,
-    # RTAB-Map's internal parameters are strings:
-    'Odom/ScanKeyFrameThr': '0.4',
-    'OdomF2M/ScanSubtractRadius': str(voxel_size_value),
-    'OdomF2M/ScanMaxSize': '15000',
-    'OdomF2M/BundleAdjustment': 'false',
-    'Icp/CorrespondenceRatio': '0.01'
-  }
-  if imu_used:
-    icp_odometry_parameters['wait_imu_to_init'] = True
 
   rtabmap_parameters = {
     'subscribe_depth': False,
@@ -113,6 +84,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'subscribe_odom_info': True,
     'subscribe_scan_cloud': True,
     'map_frame_id': 'new_map',
+    'odom_frame_id': 'odom',  # FAST-LIO's odometry frame
     'odom_sensor_sync': True, # This will adjust camera position based on difference between lidar and camera stamps.
     # RTAB-Map's internal parameters are strings:
     'RGBD/ProximityMaxGraphDepth': '0',
@@ -134,7 +106,8 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   else:
     arguments.append('-d') # This will delete the previous database (~/.ros/rtabmap.db)
   
-  remappings = [('odom', 'icp_odom')]
+  # Use FAST-LIO odometry instead of ICP odometry
+  remappings = [('odom', '/fast_lio2/Odometry')]
   if imu_used:
     remappings.append(('imu', 'imu/data'))  # notice namespace problem
   else:
@@ -163,12 +136,16 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
       namespace=robot_ns,
       parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
       remappings=remappings),
-
+      
+    # fast_lio2 node
     Node(
-      package='rtabmap_odom', executable='icp_odometry', output='screen',
-      namespace=robot_ns,
-      parameters=[shared_parameters, icp_odometry_parameters],
-      remappings=remappings + [('scan_cloud', lidar_topic_deskewed)]),
+        package='fast_lio',
+        executable='fastlio_mapping',
+        parameters=[PathJoinSubstitution([os.path.join(
+          get_package_share_directory('yanzj_ros2_bridge'), 'config'
+        ), 'fast_lio2_mid360.yaml']), {'use_sim_time': use_sim_time}],
+        output='screen'
+    ),
     
     Node(
       package='rtabmap_slam', executable='rtabmap', output='screen',
@@ -182,7 +159,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
       package='rtabmap_viz', executable='rtabmap_viz', output='screen',
       namespace=robot_ns,
       parameters=[shared_parameters, rtabmap_parameters],
-      remappings=remappings + [('scan_cloud', 'odom_filtered_input_scan')])
+      remappings=remappings + [('scan_cloud', lidar_topic_deskewed)])  # Use FAST-LIO2 output directly
   ]
 
   print(imu_used)
@@ -196,36 +173,6 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
                       'publish_tf':False}],
         remappings=[('imu/data_raw', imu_topic)]))
 
-  if fixed_frame_from_imu:
-    # Create a stabilized base frame based on imu for lidar deskewing
-    nodes.append(
-      Node(
-        package='rtabmap_util', executable='imu_to_tf', output='screen',
-        namespace=robot_ns,
-        parameters=[{
-          'use_sim_time': use_sim_time,
-          'fixed_frame_id': fixed_frame_id,
-          'base_frame_id': frame_id,
-          'wait_for_transform_duration': 0.001}],
-        # remappings=[('imu/data', imu_topic)]
-      )
-    )
-
-  if fixed_frame_id and deskewing:
-    # Lidar deskewing
-    nodes.append(
-      Node(
-        package='rtabmap_util', executable='lidar_deskewing', output='screen',
-        namespace=robot_ns,
-        parameters=[{
-          'use_sim_time': use_sim_time,
-          'fixed_frame_id': fixed_frame_id,
-          'wait_for_transform': 0.2,
-          'slerp': deskewing_slerp}],
-        remappings=[
-            ('input_cloud', lidar_topic)
-        ])
-    )
       
   return nodes
   
@@ -238,24 +185,16 @@ def generate_launch_description():
       description='Use simulated clock.'),
     
     DeclareLaunchArgument(
-      'deskewing', default_value='true',
-      description='Enable lidar deskewing.'),
-    
-    DeclareLaunchArgument(
       'frame_id', default_value='base_link',
       description='Base frame of the robot.'),
-    
-    DeclareLaunchArgument(
-      'fixed_frame_id', default_value='',
-      description='Fixed frame used for lidar deskewing. If not set, we will generate one from IMU.'),
     
     DeclareLaunchArgument(
       'localization', default_value='false',
       description='Localization mode.'),
 
     DeclareLaunchArgument(
-      'lidar_topic', default_value='/livox/lidar',
-      description='Name of the lidar PointCloud2 topic.'),
+      'fast_lio_cloud_topic', default_value='/fast_lio2/cloud_registered',
+      description='FAST-LIO2 registered point cloud topic.'),
 
     DeclareLaunchArgument(
       'imu_topic', default_value='/livox/imu',
@@ -282,20 +221,12 @@ def generate_launch_description():
       description='Depth image topic.'),
 
     DeclareLaunchArgument(
-      'expected_update_rate', default_value='15.0',
-      description='Expected lidar frame rate. Ideally, set it slightly higher than actual frame rate, like 15 Hz for 10 Hz lidar scans.'),
-    
-    DeclareLaunchArgument(
       'voxel_size', default_value='0.1',
       description='Voxel size (m) of the downsampled lidar point cloud. For indoor, set it between 0.1 and 0.3. For outdoor, set it to 0.5 or over.'),
     
     DeclareLaunchArgument(
       'min_loop_closure_overlap', default_value='0.2',
       description='Minimum scan overlap pourcentage to accept a loop closure.'),
-    
-    DeclareLaunchArgument(
-      'deskewing_slerp', default_value='true',
-      description='Use fast slerp interpolation between first and last stamps of the scan for deskewing. It would less accruate than requesting TF for every points, but a lot faster. Enable this if the delay of the deskewed scan is significant larger than the original scan.'),
 
     DeclareLaunchArgument(
       'qos', default_value='1',
