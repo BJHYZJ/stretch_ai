@@ -132,8 +132,20 @@ def launch_setup(context, *args, **kwargs):
     #     output="screen"
     # )
 
-    # Static transform from lidar to robot base
-    static_tf_base_to_lidar = Node(
+
+    # Static transform from fast lio2 lidar frame to livox lidar frame
+    static_tf_lidar_to_livox = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_tf_lidar_to_livox",
+        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'lidar_frame', 'livox_frame'],
+        output="screen",
+        parameters=[{'use_sim_time': False}]
+    )
+
+
+    # Static transform from livox frame to robot base
+    static_tf_livox_to_base = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
         name="static_tf_livox_to_base",
@@ -143,12 +155,12 @@ def launch_setup(context, *args, **kwargs):
         parameters=[{'use_sim_time': False}]
     )
 
-    # Static transform from fast lio2 lidar frame to livox lidar frame
-    static_tf_lidar_to_livox = Node(
+
+    static_tf_base_to_footprint = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
-        name="static_tf_lidar_to_livox",
-        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'lidar_frame', 'livox_frame'],
+        name="static_tf_base_to_footprint",
+        arguments=['0.0', '0', '-0.325', '0', '0', '0', 'base_link', 'base_footprint'],
         output="screen",
         parameters=[{'use_sim_time': False}]
     )
@@ -167,8 +179,9 @@ def launch_setup(context, *args, **kwargs):
         lidar_launch,
         livox_repub_node,
         static_tf_camera_to_eef,
-        static_tf_base_to_lidar,
         static_tf_lidar_to_livox,
+        static_tf_livox_to_base,
+        static_tf_base_to_footprint,
         xarm_launch,
         ranger_launch,
         robot_state_publisher_node,

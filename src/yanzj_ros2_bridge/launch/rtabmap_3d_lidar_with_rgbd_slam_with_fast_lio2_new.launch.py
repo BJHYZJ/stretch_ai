@@ -77,13 +77,14 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'Icp/OutlierRatio': '0.7',
   }
 
+
   rtabmap_parameters = {
     'subscribe_depth': False,
     'subscribe_rgb': False,
     'subscribe_rgbd': use_camera,
     'subscribe_odom_info': True,
     'subscribe_scan_cloud': True,
-    'map_frame_id': 'new_map',
+    'map_frame_id': 'map',
     'odom_frame_id': 'odom',  # FAST-LIO's odometry frame
     'odom_sensor_sync': True, # This will adjust camera position based on difference between lidar and camera stamps.
     # RTAB-Map's internal parameters are strings:
@@ -91,11 +92,44 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'RGBD/ProximityPathMaxNeighbors': '1',
     'RGBD/AngularUpdate': '0.05',
     'RGBD/LinearUpdate': '0.05',
-    'RGBD/CreateOccupancyGrid': 'false',  # TODO, 默认为false
-    'RGBD/ForceOdom3DoF': 'true',        # 默认: true - 强制3自由度里程计。false=允许6DoF，更适应震动环境
+    'RGBD/CreateOccupancyGrid': 'true',  # TODO, 默认为false
+    'RGBD/ForceOdom3DoF': 'false',       # 默认: true - Force odometry pose to be 3DoF if Reg/Force3DoF=true.
+    'RGBD/MaxDepth': '3.0',
+    'RGBD/MinDepth': '0.2',
+
+    # Grid 相关参数 - 3D地面和斜坡环境优化
+    'Grid/3D': 'true',                    # 启用3D栅格地图
+    'Grid/CellSize': '0.05',              # 栅格分辨率 (米)
+    'Grid/NormalsSegmentation': 'true',   # 启用地面分割，区分地面和障碍物
+    'Grid/NormalK': '20',                 # 法向邻域
+    'Grid/MaxGroundAngle': '30',          # 地面法向与全局地面法向夹角阈值（度）
+
+    'Grid/MaxGroundHeight': '0.15',        # 最大地面高度 (米) - 允许一定坡度
+    'Grid/MinGroundHeight': '-0.15',       # 最小地面高度 (米) - 允许下坡
+    
+    'Grid/MaxObstacleHeight': '3',      # 最大障碍物高度 (米) - 适合小车通过
+    'Grid/GroundIsObstacle': 'false',     # 地面不视为障碍物
+
+    'Grid/PreVoxelFiltering': 'true',     # 预处理体素滤波
+    'Grid/NoiseFilteringRadius': '0.1',   # 噪声过滤半径
+    'Grid/NoiseFilteringMinNeighbors': '5', # 最小邻居数量
+
+    'Grid/RangeMax': '5',               # 最大检测距离 (米)
+    'Grid/RangeMin': '0.1',               # 最小检测距离 (米)
+
+    'Grid/FootprintLength': '0.8',        # 机器人长度 (米) - 根据Ranger尺寸
+    'Grid/FootprintWidth': '0.5',         # 机器人宽度 (米) - 根据Ranger尺寸
+    'Grid/FootprintHeight': '1.4',        # 机器人高度 (米) - 根据Ranger-xarm尺寸
+
+    'Grid/RayTracing': 'true',
+    'Grid/Sensor': "2",                   # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
+    
     'Mem/NotLinkedNodesKept': 'false',
     'Mem/STMSize': '30',
-    'Reg/Strategy': '1',
+
+    'Reg/Force3DoF': 'false',
+    'Reg/RepeatOnce': 'true',
+    'Reg/Strategy': '1',  # 0=Vis, 1=Icp, 2=VisIcp
     'Icp/CorrespondenceRatio': str(LaunchConfiguration('min_loop_closure_overlap').perform(context))
   }
   
@@ -128,6 +162,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     remappings.append(('rgb/image', rgb_image_topic))
     remappings.append(('rgb/camera_info', rgb_camera_info_topic))
     remappings.append(('depth/image', depth_image_topic))
+    remappings.append(('grid_map', 'map'))
   
   nodes = [
     Node(
@@ -191,7 +226,7 @@ def generate_launch_description():
       description='Use simulated clock.'),
     
     DeclareLaunchArgument(
-      'frame_id', default_value='base_link',
+      'frame_id', default_value='base_footprint',
       description='Base frame of the robot.'),
     
     DeclareLaunchArgument(

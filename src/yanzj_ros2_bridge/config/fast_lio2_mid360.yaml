@@ -1,10 +1,10 @@
 /**:
     ros__parameters:
         feature_extract_enable: false
-        point_filter_num: 3
+        point_filter_num: 2
         max_iteration: 3
-        filter_size_surf: 0.5
-        filter_size_map: 0.5
+        filter_size_surf: 0.35  # default 0.5
+        filter_size_map: 0.35  # default 0.5
         cube_side_length: 1000.0
         runtime_pos_log_enable: false
         map_file_path: "./test.pcd"
@@ -40,8 +40,8 @@
             path_en: false                # true: publish Path
             effect_map_en: false         # true: publish Effects
             map_en: false                 # true: publish Map cloud
-            scan_publish_en:  true        # true: publish registered point cloud for RTAB-Map
-            dense_publish_en: false      # false: low down the points number in a global-frame point clouds scan.
+            scan_publish_en:  true        # false: close all the point cloud output
+            dense_publish_en: true       # true: publish dense point cloud for better SLAM
             scan_bodyframe_pub_en: false  # true: output the point cloud scans in IMU-body-frame
 
         pcd_save:
