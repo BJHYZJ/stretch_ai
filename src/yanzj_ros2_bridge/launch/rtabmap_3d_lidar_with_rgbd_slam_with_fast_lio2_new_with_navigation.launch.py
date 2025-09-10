@@ -111,25 +111,25 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'Grid/GroundIsObstacle': 'false',     # 地面不视为障碍物
 
     'Grid/PreVoxelFiltering': 'true',     # 预处理体素滤波
-    'Grid/NoiseFilteringRadius': '0.1',   # 噪声过滤半径
-    'Grid/NoiseFilteringMinNeighbors': '5', # 最小邻居数量
+    'Grid/NoiseFilteringRadius': '0.12',   # 噪声过滤半径
+    'Grid/NoiseFilteringMinNeighbors': '8', # 最小邻居数量
 
-    'Grid/RangeMax': '5',               # 最大检测距离 (米)
-    'Grid/RangeMin': '0.1',               # 最小检测距离 (米)
+    'Grid/RangeMax': '3.0',               # 最大检测距离 (米)
+    'Grid/RangeMin': '0.2',               # 最小检测距离 (米)
 
     'Grid/FootprintLength': '0.8',        # 机器人长度 (米) - 根据Ranger尺寸
     'Grid/FootprintWidth': '0.5',         # 机器人宽度 (米) - 根据Ranger尺寸
     'Grid/FootprintHeight': '1.4',        # 机器人高度 (米) - 根据Ranger-xarm尺寸
 
     'Grid/RayTracing': 'true',
-    'Grid/Sensor': "2",                   # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
+    'Grid/Sensor': "1",                   # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
     
     'Mem/NotLinkedNodesKept': 'false',
     'Mem/STMSize': '30',
 
     'Reg/Force3DoF': 'false',
     'Reg/RepeatOnce': 'true',
-    'Reg/Strategy': '1',  # 0=Vis, 1=Icp, 2=VisIcp
+    'Reg/Strategy': '2',  # 0=Vis, 1=Icp, 2=VisIcp
     'Icp/CorrespondenceRatio': str(LaunchConfiguration('min_loop_closure_overlap').perform(context))
   }
   
