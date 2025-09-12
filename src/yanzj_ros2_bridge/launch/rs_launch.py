@@ -38,7 +38,7 @@ configurable_parameters = [
     {"name": "device_type", "default": "''", "description": "choose device by type"},
     {"name": "config_file", "default": "''", "description": "yaml config file"},
     {"name": "json_file_path", "default": "''", "description": "allows advanced configuration"},
-    {"name": "initial_reset", "default": "false", "description": "''"},
+    {"name": "initial_reset", "default": "true", "description": "''"},
     {
         "name": "accelerate_gpu_with_glsl",
         "default": "false",

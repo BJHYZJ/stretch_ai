@@ -41,7 +41,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'joint_states_rate',
-            default_value='20',
+            default_value='50',
             description='Joint states publish rate in Hz.',
         )
     )

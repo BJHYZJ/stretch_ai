@@ -4,9 +4,17 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Map3
+        - /Global Options1
+        - /PointCloud21
+        - /Map1
+        - /TF1
+        - /TF1/Frames1
+        - /Global_Costmap1
+        - /Local_Costmap1
+        - /Pose1
+        - /Path1
       Splitter Ratio: 0.5
-    Tree Height: 719
+    Tree Height: 845
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -59,222 +67,84 @@ Visualization Manager:
         Value: robot_description
       Enabled: true
       Links:
-        All Links Enabled: true
+        All Links Enabled:
+          {}
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        arm_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        camera_accel_frame:
+        fl_steering_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_accel_optical_frame:
+        fl_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_bottom_screw_frame:
+        fr_steering_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_color_frame:
+        fr_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_color_optical_frame:
+        link1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_depth_frame:
+        link2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_depth_optical_frame:
+        link3:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_gyro_frame:
+        link4:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_gyro_optical_frame:
+        link5:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_infra1_frame:
+        link6:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_infra1_optical_frame:
+        link_base:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_infra2_frame:
+        link_eef:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_infra2_optical_frame:
+        rl_steering_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_link:
+        rl_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        caster_link:
+        rr_steering_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        laser:
+        rr_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        link_arm_l0:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_arm_l1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_arm_l2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_arm_l3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_arm_l4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_aruco_inner_wrist:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_aruco_left_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_aruco_right_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_aruco_shoulder:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_aruco_top_wrist:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_grasp_center:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        link_gripper_finger_left:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_gripper_finger_right:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_gripper_fingertip_left:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_gripper_fingertip_right:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_head:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_head_pan:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_head_tilt:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_left_wheel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_lift:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_mast:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_right_wheel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_straight_gripper:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_wrist_pitch:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_wrist_roll:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_wrist_yaw:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link_wrist_yaw_bottom:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        respeaker_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -313,7 +183,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /cloud_map
+        Value: /rtabmap_ranger_xarm/cloud_map
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -329,150 +199,84 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /map
+        Value: /rtabmap_ranger_xarm/map
       Update Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /map_updates
+        Value: /rtabmap_ranger_xarm/map_updates
       Use Timestamp: false
-      Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz_default_plugins/LaserScan
-      Color: 255; 255; 255
-      Color Transformer: Intensity
-      Decay Time: 0
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 47
-      Min Color: 0; 0; 0
-      Min Intensity: 47
-      Name: LaserScan
-      Position Transformer: XYZ
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.009999999776482582
-      Style: Flat Squares
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /scan
-      Use Fixed Frame: true
-      Use rainbow: true
       Value: true
     - Class: rviz_default_plugins/TF
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: false
+        All Enabled: true
+        arm_base:
+          Value: true
         base_footprint:
-          Value: false
+          Value: true
         base_link:
           Value: true
         camera_accel_frame:
-          Value: false
+          Value: true
         camera_accel_optical_frame:
-          Value: false
-        camera_bottom_screw_frame:
-          Value: false
+          Value: true
         camera_color_frame:
-          Value: false
+          Value: true
         camera_color_optical_frame:
-          Value: false
+          Value: true
         camera_depth_frame:
-          Value: false
+          Value: true
         camera_depth_optical_frame:
-          Value: false
+          Value: true
         camera_gyro_frame:
-          Value: false
+          Value: true
         camera_gyro_optical_frame:
-          Value: false
-        camera_infra1_frame:
-          Value: false
-        camera_infra1_optical_frame:
-          Value: false
-        camera_infra2_frame:
-          Value: false
-        camera_infra2_optical_frame:
-          Value: false
+          Value: true
         camera_link:
-          Value: false
-        caster_link:
-          Value: false
-        laser:
-          Value: false
-        link_arm_l0:
-          Value: false
-        link_arm_l1:
-          Value: false
-        link_arm_l2:
-          Value: false
-        link_arm_l3:
-          Value: false
-        link_arm_l4:
-          Value: false
-        link_aruco_inner_wrist:
-          Value: false
-        link_aruco_left_base:
-          Value: false
-        link_aruco_right_base:
-          Value: false
-        link_aruco_shoulder:
-          Value: false
-        link_aruco_top_wrist:
-          Value: false
-        link_grasp_center:
-          Value: false
-        link_gripper_finger_left:
-          Value: false
-        link_gripper_finger_right:
-          Value: false
-        link_gripper_fingertip_left:
-          Value: false
-        link_gripper_fingertip_right:
-          Value: false
-        link_head:
-          Value: false
-        link_head_pan:
-          Value: false
-        link_head_tilt:
-          Value: false
-        link_left_wheel:
-          Value: false
-        link_lift:
-          Value: false
-        link_mast:
-          Value: false
-        link_right_wheel:
-          Value: false
-        link_straight_gripper:
-          Value: false
-        link_wrist_pitch:
-          Value: false
-        link_wrist_roll:
-          Value: false
-        link_wrist_yaw:
-          Value: false
-        link_wrist_yaw_bottom:
-          Value: false
+          Value: true
+        fl_steering_wheel_link:
+          Value: true
+        fl_wheel_link:
+          Value: true
+        fr_steering_wheel_link:
+          Value: true
+        fr_wheel_link:
+          Value: true
+        lidar_frame:
+          Value: true
+        link1:
+          Value: true
+        link2:
+          Value: true
+        link3:
+          Value: true
+        link4:
+          Value: true
+        link5:
+          Value: true
+        link6:
+          Value: true
+        link_base:
+          Value: true
+        link_eef:
+          Value: true
+        livox_frame:
+          Value: true
         map:
           Value: true
         odom:
           Value: true
-        respeaker_base:
-          Value: false
+        rl_steering_wheel_link:
+          Value: true
+        rl_wheel_link:
+          Value: true
+        rr_steering_wheel_link:
+          Value: true
+        rr_wheel_link:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -480,81 +284,76 @@ Visualization Manager:
       Show Names: false
       Tree:
         map:
-          odom:
-            base_link:
-              base_footprint:
-                {}
-              caster_link:
-                {}
-              laser:
-                {}
-              link_aruco_left_base:
-                {}
-              link_aruco_right_base:
-                {}
-              link_left_wheel:
-                {}
-              link_mast:
-                link_head:
-                  link_head_pan:
-                    link_head_tilt:
-                      camera_bottom_screw_frame:
-                        camera_link:
-                          camera_accel_frame:
-                            camera_accel_optical_frame:
-                              {}
-                          camera_color_frame:
-                            camera_color_optical_frame:
-                              {}
-                          camera_depth_frame:
-                            camera_depth_optical_frame:
-                              {}
-                          camera_gyro_frame:
-                            camera_gyro_optical_frame:
-                              {}
-                          camera_infra1_frame:
-                            camera_infra1_optical_frame:
-                              {}
-                          camera_infra2_frame:
-                            camera_infra2_optical_frame:
-                              {}
-                link_lift:
-                  link_arm_l4:
-                    link_arm_l3:
-                      link_arm_l2:
-                        link_arm_l1:
-                          link_arm_l0:
-                            link_aruco_inner_wrist:
-                              {}
-                            link_aruco_top_wrist:
-                              {}
-                            link_wrist_yaw:
-                              link_wrist_yaw_bottom:
-                                link_wrist_pitch:
-                                  link_wrist_roll:
-                                    link_straight_gripper:
-                                      link_grasp_center:
+          {}
+        odom:
+          lidar_frame:
+            livox_frame:
+              base_link:
+                arm_base:
+                  link_base:
+                    link1:
+                      link2:
+                        link3:
+                          link4:
+                            link5:
+                              link6:
+                                link_eef:
+                                  camera_link:
+                                    camera_accel_frame:
+                                      camera_accel_optical_frame:
                                         {}
-                                      link_gripper_finger_left:
-                                        link_gripper_fingertip_left:
-                                          {}
-                                      link_gripper_finger_right:
-                                        link_gripper_fingertip_right:
-                                          {}
-                  link_aruco_shoulder:
-                    {}
-                respeaker_base:
+                                    camera_color_frame:
+                                      camera_color_optical_frame:
+                                        {}
+                                    camera_depth_frame:
+                                      camera_depth_optical_frame:
+                                        {}
+                                    camera_gyro_frame:
+                                      camera_gyro_optical_frame:
+                                        {}
+                base_footprint:
                   {}
-              link_right_wheel:
-                {}
+                fl_steering_wheel_link:
+                  fl_wheel_link:
+                    {}
+                fr_steering_wheel_link:
+                  fr_wheel_link:
+                    {}
+                rl_steering_wheel_link:
+                  rl_wheel_link:
+                    {}
+                rr_steering_wheel_link:
+                  rr_wheel_link:
+                    {}
       Update Interval: 0
       Value: true
-    - Alpha: 0.699999988079071
+    - Alpha: 0.4000000059604645
       Class: rviz_default_plugins/Map
       Color Scheme: costmap
       Draw Behind: false
       Enabled: true
-      Name: Map
+      Name: Global_Costmap
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /global_costmap/costmap
+      Update Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /global_costmap/costmap_updates
+      Use Timestamp: false
+      Value: true
+    - Alpha: 0.6000000238418579
+      Class: rviz_default_plugins/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Local_Costmap
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -570,26 +369,53 @@ Visualization Manager:
         Value: /local_costmap/costmap_updates
       Use Timestamp: false
       Value: true
-    - Alpha: 0.4000000059604645
-      Class: rviz_default_plugins/Map
-      Color Scheme: costmap
-      Draw Behind: false
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz_default_plugins/Pose
+      Color: 255; 25; 0
       Enabled: true
-      Name: Map
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Axes
       Topic:
         Depth: 5
         Durability Policy: Volatile
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /global_costmap/costmap
-      Update Topic:
+        Value: /goal_pose
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 25; 255; 0
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic:
         Depth: 5
         Durability Policy: Volatile
+        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /global_costmap/costmap_updates
-      Use Timestamp: false
+        Value: /plan
       Value: true
   Enabled: true
   Global Options:
@@ -637,33 +463,33 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 9.573360443115234
+      Distance: 8.49476146697998
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 1.263545036315918
+        Y: -0.06780941039323807
+        Z: -0.0306733138859272
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9847965240478516
+      Pitch: 1.2997963428497314
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.0903942584991455
+      Yaw: 2.9854061603546143
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1016
+  Height: 1142
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001560000035afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000035a000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073a0000003efc0100000002fb0000000800540069006d006501000000000000073a000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004c90000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000026f000003d8fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000003d8000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f000003d8fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d000003d8000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074b0000003efc0100000002fb0000000800540069006d006501000000000000074b000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000003c1000003d800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -672,6 +498,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1850
+  Width: 1867
   X: 70
-  Y: 27
+  Y: 201

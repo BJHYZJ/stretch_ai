@@ -3,10 +3,10 @@ import os.path
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, GroupAction
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.conditions import IfCondition
-from launch_ros.actions import Node, PushRosNamespace
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -34,7 +34,7 @@ def generate_launch_description():
         description='Config file'
     )
     declare_rviz_cmd = DeclareLaunchArgument(
-        'rviz', default_value='false',
+        'rviz', default_value='true',
         description='Use RViz to monitor results'
     )
     declare_rviz_config_path_cmd = DeclareLaunchArgument(

@@ -7,6 +7,7 @@ from std_msgs.msg import Header
 import threading
 import time
 from typing import Dict, List, Optional
+from rclpy.duration import Duration
 
 
 class JointStateAggregator(Node):
@@ -36,19 +37,12 @@ class JointStateAggregator(Node):
         self.ranger_joint_states: Optional[JointState] = None
         self.xarm_joint_states: Optional[JointState] = None
         
-        # Timestamps for timeout checking
-        self.ranger_last_update = 0.0
-        self.xarm_last_update = 0.0
+        # Timestamps for timeout checking (using ROS time)
+        self.ranger_last_update: Optional[rclpy.time.Time] = None
+        self.xarm_last_update: Optional[rclpy.time.Time] = None
         
         # Thread lock for data access
         self.lock = threading.Lock()
-        
-        # Publishers and subscribers
-        self.joint_states_pub = self.create_publisher(
-            JointState, 
-            self.output_topic, 
-            10
-        )
         
         self.ranger_sub = self.create_subscription(
             JointState,
@@ -63,6 +57,13 @@ class JointStateAggregator(Node):
             self.xarm_callback,
             10
         )
+
+        # Publishers and subscribers
+        self.joint_states_pub = self.create_publisher(
+            JointState, 
+            self.output_topic, 
+            10
+        )
         
         # Timer for publishing aggregated joint states
         self.timer = self.create_timer(
@@ -74,27 +75,37 @@ class JointStateAggregator(Node):
         self.get_logger().info(f'Subscribing to: {self.ranger_topic}, {self.xarm_topic}')
         self.get_logger().info(f'Publishing to: {self.output_topic}')
         self.get_logger().info(f'Publish frequency: {self.publish_frequency} Hz')
+        self.get_logger().info(f'Timeout threshold: {self.timeout_threshold} seconds')
+        self.get_logger().info(f'QoS queue depth: 10 (for all subscriptions and publications)')
     
     def ranger_callback(self, msg: JointState):
         """Callback for ranger joint states"""
         with self.lock:
             self.ranger_joint_states = msg
-            self.ranger_last_update = time.time()
+            self.ranger_last_update = self.get_clock().now()
     
     def xarm_callback(self, msg: JointState):
         """Callback for xarm joint states"""
         with self.lock:
             self.xarm_joint_states = msg
-            self.xarm_last_update = time.time()
+            self.xarm_last_update = self.get_clock().now()
     
     def publish_aggregated_states(self):
         """Publish aggregated joint states"""
-        current_time = time.time()
+        current_time = self.get_clock().now()
         
         with self.lock:
-            # Check if data is fresh enough
-            ranger_fresh = (current_time - self.ranger_last_update) < self.timeout_threshold
-            xarm_fresh = (current_time - self.xarm_last_update) < self.timeout_threshold
+            # Check if data is fresh enough using ROS time
+            ranger_fresh = False
+            xarm_fresh = False
+            
+            if self.ranger_last_update is not None:
+                time_diff = (current_time - self.ranger_last_update).nanoseconds * 1e-9
+                ranger_fresh = time_diff < self.timeout_threshold
+                
+            if self.xarm_last_update is not None:
+                time_diff = (current_time - self.xarm_last_update).nanoseconds * 1e-9
+                xarm_fresh = time_diff < self.timeout_threshold
             
             # Create aggregated joint state
             aggregated_msg = JointState()
@@ -125,9 +136,9 @@ class JointStateAggregator(Node):
                 
                 # Log if any robot is not publishing fresh data
                 if not ranger_fresh and self.ranger_joint_states:
-                    self.get_logger().warn_once('Ranger joint states are stale')
+                    self.get_logger().warn('Ranger joint states are stale')
                 if not xarm_fresh and self.xarm_joint_states:
-                    self.get_logger().warn_once('XArm joint states are stale')
+                    self.get_logger().warn('XArm joint states are stale')
 
 
 def main(args=None):
@@ -146,3 +157,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
