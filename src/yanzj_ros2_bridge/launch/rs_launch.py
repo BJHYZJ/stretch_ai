@@ -130,7 +130,7 @@ configurable_parameters = [
     {"name": "accel_fps", "default": "0", "description": "''"},
     {
         "name": "unite_imu_method",
-        "default": "0",
+        "default": "2",
         "description": "[0-None, 1-copy, 2-linear_interpolation]",
     },
     {"name": "clip_distance", "default": "-2.", "description": "''"},
