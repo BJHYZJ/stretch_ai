@@ -41,7 +41,7 @@
             effect_map_en: false         # true: publish Effects
             map_en: false                 # true: publish Map cloud
             scan_publish_en:  true        # false: close all the point cloud output
-            dense_publish_en: true       # true: publish dense point cloud for better SLAM
+            dense_publish_en: false       # true: publish dense point cloud for better SLAM
             scan_bodyframe_pub_en: true  # true: output the point cloud scans in IMU-body-frame  # 作为rtabmap_ros的输入
 
         pcd_save:
