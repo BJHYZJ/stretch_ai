@@ -55,7 +55,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   localization = localization == 'true' or localization == 'True'
   
   # Rule of thumb:
-  max_correspondence_distance = voxel_size_value * 10.0
+  max_correspondence_distance = voxel_size_value * 20.0  # default * 10
 
   shared_parameters = {
     'use_sim_time': use_sim_time,
@@ -73,6 +73,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'Icp/PointToPlaneRadius': '0',
     'Icp/MaxTranslation': '3',
     'Icp/MaxCorrespondenceDistance': str(max_correspondence_distance),
+    # 'Icp/MaxCorrespondenceDistance': '1',
     'Icp/Strategy': '1',
     'Icp/OutlierRatio': '0.7',
   }
@@ -88,6 +89,8 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'map_frame_id': 'map',
     'odom_frame_id': 'odom',  # FAST-LIO's odometry frame
     
+    'Rtabmap/DetectionRate': '2.0', 
+
     # RTAB-Map's internal parameters are strings:
     'RGBD/ProximityMaxGraphDepth': '0',
     'RGBD/ProximityPathMaxNeighbors': '1',
@@ -97,6 +100,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'RGBD/ForceOdom3DoF': 'false',       # 默认: true - Force odometry pose to be 3DoF if Reg/Force3DoF=true.
 
     'Grid/3D': 'false', 
+    'Grid/Sensor': "0",  # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
 
     # 'Grid/3D': 'false', 
     # 'Grid/CellSize': '0.05',
@@ -112,7 +116,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     # 'Grid/RangeMax': '10.0',  # Maximum range from sensor. 0=inf.
     # 'Grid/RangeMin': '0.0',
     # 'Grid/RayTracing': 'true',
-    # 'Grid/Sensor': "0",  # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
+    
 
 
     # # Grid 相关参数 - 3D地面和斜坡环境优化
@@ -325,15 +329,15 @@ def generate_launch_description():
       description='Depth image topic.'),
 
     DeclareLaunchArgument(
-      'voxel_size', default_value='0.1',
+      'voxel_size', default_value='0.05',
       description='Voxel size (m) of the downsampled lidar point cloud. For indoor, set it between 0.1 and 0.3. For outdoor, set it to 0.5 or over.'),
     
     DeclareLaunchArgument(
-      'min_loop_closure_overlap', default_value='0.2',
+      'min_loop_closure_overlap', default_value='0.05',
       description='Minimum scan overlap pourcentage to accept a loop closure.'),
 
     DeclareLaunchArgument(
-      'qos', default_value='2',
+      'qos', default_value='1',
       description='Quality of Service: 0=system default, 1=reliable, 2=best effort.'),
 
     OpaqueFunction(function=launch_setup),
