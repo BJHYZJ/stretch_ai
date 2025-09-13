@@ -63,7 +63,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'qos': LaunchConfiguration('qos'),
     'approx_sync': True,  # TODO set True when use RGBD
     'wait_for_transform': 0.5,
-    'approx_sync_max_interval': '0.1',
+    'approx_sync_max_interval': '0.05',
     # RTAB-Map's internal parameters are strings:
     'Icp/PointToPlane': 'true',
     'Icp/Iterations': '10',
@@ -99,7 +99,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'RGBD/CreateOccupancyGrid': 'false',
     'RGBD/ForceOdom3DoF': 'false',       # 默认: true - Force odometry pose to be 3DoF if Reg/Force3DoF=true.
 
-    'Grid/3D': 'false', 
+    'Grid/3D': 'false',   # 显示设置为false，不需要grid，同时设置'Grid/Sensor'为0是为了避免warn: [rtabmap_ranger_xarm.rtabmap]: Setting "Grid/Sensor" parameter to 0 (default 1) as "subscribe_scan" or "subscribe_scan_cloud" or "gen_scan" is true. The occupancy grid map will be constructed from laser scans. To get occupancy grid map from cloud projection, set "Grid/Sensor" to true. To suppress this warning, add <param name="Grid/Sensor" type="string" value="0"/>
     'Grid/Sensor': "0",  # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
 
     # 'Grid/3D': 'false', 
