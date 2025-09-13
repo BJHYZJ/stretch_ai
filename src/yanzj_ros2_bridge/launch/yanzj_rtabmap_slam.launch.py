@@ -53,6 +53,8 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   
   localization = LaunchConfiguration('localization').perform(context)
   localization = localization == 'true' or localization == 'True'
+
+  force_3dof = LaunchConfiguration('force3dof').perform(context)
   
   # Rule of thumb:
   max_correspondence_distance = voxel_size_value * 20.0  # default * 10
@@ -66,7 +68,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'approx_sync_max_interval': '0.05',
     # RTAB-Map's internal parameters are strings:
     'Icp/PointToPlane': 'true',
-    'Icp/Iterations': '10',
+    'Icp/Iterations': '20',
     'Icp/VoxelSize': str(voxel_size_value),
     'Icp/Epsilon': '0.001',
     'Icp/PointToPlaneK': '20',
@@ -89,125 +91,24 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'map_frame_id': 'map',
     'odom_frame_id': 'odom',  # FAST-LIO's odometry frame
     
-    'Rtabmap/DetectionRate': '2.0', 
+    'Rtabmap/DetectionRate': '3.0', 
 
     # RTAB-Map's internal parameters are strings:
     'RGBD/ProximityMaxGraphDepth': '0',
-    'RGBD/ProximityPathMaxNeighbors': '1',
+    'RGBD/ProximityPathMaxNeighbors': '2',
     'RGBD/AngularUpdate': '0.05',
     'RGBD/LinearUpdate': '0.05',
     'RGBD/CreateOccupancyGrid': 'false',
-    'RGBD/ForceOdom3DoF': 'false',       # 默认: true - Force odometry pose to be 3DoF if Reg/Force3DoF=true.
+    'RGBD/ForceOdom3DoF': force_3dof,       # 默认: true - Force odometry pose to be 3DoF if Reg/Force3DoF=true.
 
     'Grid/3D': 'false',   # 显示设置为false，不需要grid，同时设置'Grid/Sensor'为0是为了避免warn: [rtabmap_ranger_xarm.rtabmap]: Setting "Grid/Sensor" parameter to 0 (default 1) as "subscribe_scan" or "subscribe_scan_cloud" or "gen_scan" is true. The occupancy grid map will be constructed from laser scans. To get occupancy grid map from cloud projection, set "Grid/Sensor" to true. To suppress this warning, add <param name="Grid/Sensor" type="string" value="0"/>
     'Grid/Sensor': "0",  # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
-
-    # 'Grid/3D': 'false', 
-    # 'Grid/CellSize': '0.05',
-    # 'Grid/NormalsSegmentation': 'true',
-    # 'Grid/MaxGroundAngle': '45', 
-    # 'Grid/MinGroundHeight': '-0.15',
-    # 'Grid/MaxGroundHeight': '0.15',
-    # 'Grid/PreVoxelFiltering': 'true',     # 预处理体素滤波
-    # 'Grid/NoiseFilteringRadius': '0.2',  # 邻域半径（米） 0.1~0.25
-    # 'Grid/NoiseFilteringMinNeighbors': '2',     # 至少 N 个邻居才保留（2~3）
-    # 'Grid/MaxObstacleHeight': '1.74',
-    # 'Grid/GroundIsObstacle': 'false',
-    # 'Grid/RangeMax': '10.0',  # Maximum range from sensor. 0=inf.
-    # 'Grid/RangeMin': '0.0',
-    # 'Grid/RayTracing': 'true',
-    
-
-
-    # # Grid 相关参数 - 3D地面和斜坡环境优化
-    # 'Grid/Sensor': "0",                   # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
-    # 'Grid/3D': 'true',                    # 启用3D栅格地图
-    # 'Grid/CellSize': '0.05',              # 栅格分辨率 (米)
-
-    # 'Grid/RangeMax': '0.0',               # 最大检测距离 (米)
-    # 'Grid/RangeMin': '0.0',               # 最小检测距离 (米)
-
-    # 'Grid/NormalsSegmentation': 'true',   # 启用地面分割，区分地面和障碍物
-    # 'Grid/NormalK': '20',                 # 法向邻域
-    # 'Grid/MaxGroundAngle': '45',          # 地面法向与全局地面法向夹角阈值（度）
-
-    # 'Grid/MaxGroundHeight': '0.2',        # 最大地面高度 (米) - 允许一定坡度
-    # 'Grid/MinGroundHeight': '-0.2',       # 最小地面高度 (米) - 允许下坡
-    
-    # 'Grid/MaxObstacleHeight': '4',      # 最大障碍物高度 (米) - 适合小车通过
-    # 'Grid/GroundIsObstacle': 'false',     # 地面不视为障碍物
-
-    # 'Grid/PreVoxelFiltering': 'true',     # 预处理体素滤波
-    # 'Grid/NoiseFilteringRadius': '0.1',   # 噪声过滤半径
-    # 'Grid/NoiseFilteringMinNeighbors': '2', # 最小邻居数量
-
-    # 'Grid/FootprintLength': '0.74',        # 机器人长度 (米) - 根据Ranger尺寸
-    # 'Grid/FootprintWidth': '0.5',         # 机器人宽度 (米) - 根据Ranger尺寸
-    # 'Grid/FootprintHeight': '1.4',        # 机器人高度 (米) - 根据Ranger-xarm尺寸
-
-    # 'Grid/RayTracing': 'false',
-
-
-    # 'Grid/Sensor': '0',
-    # 'Grid/3D': 'true',
-    # 'Grid/CellSize': '0.07',         # 0.07~0.10 都可以；点越稀疏取越大
-    # 'Grid/RangeMax': '50',           # 或 60/80；0.0=无限也行
-    # 'Grid/RangeMin': '0.15',         # 去掉很近的地面/噪点
-
-    # # 已注册点云 → 关闭 RayTracing，避免“连线”
-    # 'Grid/RayTracing': 'true',
-
-    # # 地面分割：改用“半径法向”，更稳；阈值放宽
-    # 'Grid/NormalsSegmentation': 'true',
-    # 'Grid/NormalK': '0',             # 0=不用固定K；改用半径
-    # 'Grid/NormalRadius': '0.30',     # 0.25~0.50 之间试；稀疏就调大
-    # 'Grid/MaxGroundAngle': '55',     # 地面不平/姿态有偏时更鲁棒（45~60）
-    # 'Grid/MaxGroundHeight': '0.25',
-    # 'Grid/MinGroundHeight': '-0.25',
-    # 'Grid/GroundIsObstacle': 'false',
-
-    # # 噪声与体素
-    # 'Grid/PreVoxelFiltering': 'true',
-    # 'Grid/NoiseFilteringRadius': '0.1',
-    # 'Grid/NoiseFilteringMinNeighbors': '2',
-
-    # # 只保留机器人高度内的障碍（按你机器人真实高度来）
-    # 'Grid/MaxObstacleHeight': '2.0',
-
-
-    # 'Grid/Sensor': '0',
-    # 'Grid/3D': 'true',
-    # 'Grid/CellSize': '0.05',         # 0.07~0.10 都可以；点越稀疏取越大
-    # 'Grid/RangeMax': '20',           # 或 60/80；0.0=无限也行
-    # 'Grid/RangeMin': '0.15',         # 去掉很近的地面/噪点
-
-    # # 已注册点云 → 关闭 RayTracing，避免“连线”
-    # 'Grid/RayTracing': 'true',
-
-    # # 地面分割：改用“半径法向”，更稳；阈值放宽
-    # 'Grid/NormalsSegmentation': 'true',
-    # 'Grid/NormalK': '0',             # 0=不用固定K；改用半径
-    # 'Grid/NormalRadius': '0.5',     # 0.25~0.50 之间试；稀疏就调大
-    # 'Grid/MaxGroundAngle': '60',     # 地面不平/姿态有偏时更鲁棒（45~60）
-    # 'Grid/MaxGroundHeight': '0.2',
-    # 'Grid/MinGroundHeight': '-0.25',
-    # 'Grid/GroundIsObstacle': 'false',
-
-    # # 噪声与体素
-    # 'Grid/PreVoxelFiltering': 'true',
-    # 'Grid/NoiseFilteringRadius': '0.05',
-    # 'Grid/NoiseFilteringMinNeighbors': '1',
-
-    # # 只保留机器人高度内的障碍（按你机器人真实高度来）
-    # 'Grid/MaxObstacleHeight': '2.0',
-
-
 
     'Mem/NotLinkedNodesKept': 'false',
     'Mem/STMSize': '60',
 
 
-    'Reg/Force3DoF': 'false',
+    'Reg/Force3DoF': force_3dof,
     'Reg/RepeatOnce': 'true',
     'Reg/Strategy': '2',  # 0=Vis, 1=Icp, 2=VisIcp
     'Icp/CorrespondenceRatio': str(LaunchConfiguration('min_loop_closure_overlap').perform(context))
@@ -333,12 +234,16 @@ def generate_launch_description():
       description='Voxel size (m) of the downsampled lidar point cloud. For indoor, set it between 0.1 and 0.3. For outdoor, set it to 0.5 or over.'),
     
     DeclareLaunchArgument(
-      'min_loop_closure_overlap', default_value='0.05',
+      'min_loop_closure_overlap', default_value='0.1',
       description='Minimum scan overlap pourcentage to accept a loop closure.'),
 
     DeclareLaunchArgument(
       'qos', default_value='1',
       description='Quality of Service: 0=system default, 1=reliable, 2=best effort.'),
+
+    DeclareLaunchArgument(
+      'force3dof', default_value="true",
+      description='Force 3 degrees-of-freedom transform (3Dof: x,y and yaw). Parameters z, roll and pitch will be set to 0'),
 
     OpaqueFunction(function=launch_setup),
   ])
