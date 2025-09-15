@@ -48,8 +48,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   use_sim_time = LaunchConfiguration('use_sim_time')
   
   # Use FAST-LIO2's output point cloud which is already registered and in odom frame
-  fast_lio_cloud_topic = LaunchConfiguration('fast_lio_cloud_topic')
-  lidar_topic_deskewed = fast_lio_cloud_topic.perform(context)
+  lidar_topic = LaunchConfiguration('lidar_topic').perform(context)
   
   localization = LaunchConfiguration('localization').perform(context)
   localization = localization == 'true' or localization == 'True'
@@ -63,9 +62,13 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'use_sim_time': use_sim_time,
     'frame_id': frame_id,
     'qos': LaunchConfiguration('qos'),
-    'approx_sync': True,  # TODO set True when use RGBD
     'wait_for_transform': 0.5,
-    'approx_sync_max_interval': '0.05',
+    # Synchronization parameters # 控制rgbd和雷达的同步参数
+    'approx_sync': True,  
+    'approx_sync_max_interval': '0.1',
+    # 'queue_size': 20,
+    'topic_queue_size': 20,
+    'sync_queue_size': 20,
     # RTAB-Map's internal parameters are strings:
     'Icp/PointToPlane': 'true',
     'Icp/Iterations': '20',
@@ -82,9 +85,9 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
 
 
   rtabmap_parameters = {
-    'subscribe_depth': True,
-    'subscribe_rgb': True,
-    'subscribe_rgbd': False,
+    'subscribe_depth': False,
+    'subscribe_rgb': False,
+    'subscribe_rgbd': True,
     'subscribe_odom_info': False,  # 只有使用rtabmap中的odom才打开，这里使用了fast_lio2的odometry，所以不能设置为true
     'subscribe_scan_cloud': True,
     'odom_sensor_sync': True, # This will adjust camera position based on difference between lidar and camera stamps.
@@ -98,11 +101,11 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'RGBD/ProximityPathMaxNeighbors': '2',
     'RGBD/AngularUpdate': '0.05',
     'RGBD/LinearUpdate': '0.05',
-    'RGBD/CreateOccupancyGrid': 'false',
+    'RGBD/CreateOccupancyGrid': 'true',
     'RGBD/ForceOdom3DoF': force_3dof,       # 默认: true - Force odometry pose to be 3DoF if Reg/Force3DoF=true.
 
-    'Grid/3D': 'false',   # 显示设置为false，不需要grid，同时设置'Grid/Sensor'为0是为了避免warn: [rtabmap_ranger_xarm.rtabmap]: Setting "Grid/Sensor" parameter to 0 (default 1) as "subscribe_scan" or "subscribe_scan_cloud" or "gen_scan" is true. The occupancy grid map will be constructed from laser scans. To get occupancy grid map from cloud projection, set "Grid/Sensor" to true. To suppress this warning, add <param name="Grid/Sensor" type="string" value="0"/>
-    'Grid/Sensor': "0",  # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
+    'Grid/3D': 'true',   # 显示设置为false，不需要grid，同时设置'Grid/Sensor'为0是为了避免warn: [rtabmap_ranger_xarm.rtabmap]: Setting "Grid/Sensor" parameter to 0 (default 1) as "subscribe_scan" or "subscribe_scan_cloud" or "gen_scan" is true. The occupancy grid map will be constructed from laser scans. To get occupancy grid map from cloud projection, set "Grid/Sensor" to true. To suppress this warning, add <param name="Grid/Sensor" type="string" value="0"/>
+    'Grid/Sensor': "1",  # Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).
 
     'Mem/NotLinkedNodesKept': 'false',
     'Mem/STMSize': '60',
@@ -131,7 +134,6 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
   remappings.append(('rgb/image', rgb_image_topic))
   remappings.append(('rgb/camera_info', rgb_camera_info_topic))
   remappings.append(('depth/image', depth_image_topic))
-  # remappings.append(('grid_map', 'map'))
   
   nodes = [
     Node(
@@ -147,19 +149,28 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
       period=5.0,
       actions=[
         Node(
+            package='rtabmap_sync', executable='rgbd_sync', output='screen',
+            namespace=robot_ns,
+            parameters=[{'approx_sync': False, 'use_sim_time': use_sim_time}],  # approx_sync，控制 RGB 图像和深度图像的同步
+            remappings=remappings),
+
+        Node(
           package='rtabmap_slam', executable='rtabmap', output='screen',
           namespace=robot_ns,
           parameters=[shared_parameters, rtabmap_parameters, 
                       {'rgbd_cameras': 1}],
-          remappings=remappings + [('scan_cloud', lidar_topic_deskewed)],
+          remappings=remappings + [('scan_cloud', lidar_topic)],
           arguments=arguments),
         
         # Node(
         #   package='rtabmap_viz', executable='rtabmap_viz', output='screen',
         #   namespace=robot_ns,
-        #   parameters=[shared_parameters, rtabmap_parameters],
-        #   remappings=remappings + [('scan_cloud', lidar_topic_deskewed)])  # Use FAST-LIO2 output directly
-
+        #   parameters=[shared_parameters, rtabmap_parameters, 
+        #               {'subscribe_depth': False,
+        #                'subscribe_rgb': False, 
+        #                'subscribe_rgbd': False,
+        #                'subscribe_scan_cloud': False}],  # Disable real-time sensor data to avoid coordinate mismatch
+        #   remappings=remappings),  # Use FAST-LIO2 output directly
 
         Node(
           package='rviz2',
@@ -167,6 +178,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
           arguments=['-d', os.path.join(
             get_package_share_directory('yanzj_ros2_bridge'), 'rviz', 'rtabmap_vis.rviz')],
           condition=IfCondition(LaunchConfiguration('rviz_use')))
+
       ]
     )
   ]
@@ -206,7 +218,7 @@ def generate_launch_description():
       description='Localization mode.'),
 
     DeclareLaunchArgument(
-      'fast_lio_cloud_topic', default_value='/fast_lio2/cloud_registered_body',  # /fast_lio2/cloud_registered_body在lidar_frame坐标系下
+      'lidar_topic', default_value='/fast_lio2/cloud_registered_body',  # /fast_lio2/cloud_registered_body在lidar_frame坐标系下
       description='FAST-LIO2 registered point cloud topic.'),
 
     DeclareLaunchArgument(
