@@ -210,7 +210,7 @@ def generate_launch_description():
       description='FAST-LIO2 registered point cloud topic.'),
 
     DeclareLaunchArgument(
-      'imu_topic', default_value='/livox/imu',
+      'imu_topic', default_value='/camera/imu',  # with realsense-d435i imu information
       description='IMU topic (ignored if empty).'),
     
     DeclareLaunchArgument(
