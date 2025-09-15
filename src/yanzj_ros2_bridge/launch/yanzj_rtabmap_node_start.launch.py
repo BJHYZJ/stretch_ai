@@ -47,7 +47,7 @@ def launch_setup(context, *args, **kwargs):
             ]),
             launch_arguments={
                 'robot_ip': '192.168.1.233',
-                'report_type': 'dev',  # maybe I can set joint_states_rate to 50
+                'joint_states_rate': '50',  # 设置机械臂关节状态发布频率为50Hz
             }.items(),
         ),  
     ])
@@ -69,12 +69,12 @@ def launch_setup(context, *args, **kwargs):
                 '/launch/livox_mid360_driver.launch.py'])),  
     ])
 
-    livox_repub_node = Node(
-        package='livox_repub_ros2',
-        executable='livox_repub_node',
-        name='livox_repub_node',
-        output='screen'
-    )
+    # livox_repub_node = Node(  # 暂时不使用livox_repub_node，因为fast_lio2的输出可以直接输入到rtabmap中
+    #     package='livox_repub_ros2',
+    #     executable='livox_repub_node',
+    #     name='livox_repub_node',
+    #     output='screen'
+    # )
 
     # fast_lio2_launch = LaunchDescription([
     #     IncludeLaunchDescription(
@@ -102,7 +102,7 @@ def launch_setup(context, *args, **kwargs):
         output='screen',
         parameters=[{
             'robot_description': robot_description_content,
-            'publish_frequency': 50.0
+            'publish_frequency': 50.0,
         }]
     )
 
@@ -114,7 +114,8 @@ def launch_setup(context, *args, **kwargs):
         output='screen',
         parameters=[{
             'source_list': ['/ranger/joint_states', '/xarm/joint_states'],
-            'use_sim_time': use_sim_time
+            'use_sim_time': use_sim_time,
+            'rate': 30.0,
         }]
     )
 
@@ -183,7 +184,7 @@ def launch_setup(context, *args, **kwargs):
     return [
         camera_launch,
         lidar_launch,
-        livox_repub_node,
+        # livox_repub_node,
         static_tf_camera_to_eef,
         static_tf_lidar_to_livox,
         static_tf_livox_to_base,

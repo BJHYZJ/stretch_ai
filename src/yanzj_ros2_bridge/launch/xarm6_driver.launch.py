@@ -49,7 +49,7 @@ def generate_launch_description():
     # Initialize Arguments
     robot_ip = LaunchConfiguration('robot_ip')
     report_type = LaunchConfiguration('report_type', default='normal')
-    joint_states_rate = LaunchConfiguration('joint_states_rate', default='20')
+    joint_states_rate = LaunchConfiguration('joint_states_rate', default='50')
     hw_ns = LaunchConfiguration('hw_ns', default='xarm')
     add_gripper = LaunchConfiguration('add_gripper', default=False)
     add_vacuum_gripper = LaunchConfiguration('add_vacuum_gripper', default=False)
