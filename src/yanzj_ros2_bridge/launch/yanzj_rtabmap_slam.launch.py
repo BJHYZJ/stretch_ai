@@ -94,7 +94,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
     'map_frame_id': 'map',
     'odom_frame_id': 'odom',  # FAST-LIO's odometry frame
     
-    'Rtabmap/DetectionRate': '3.0', 
+    'Rtabmap/DetectionRate': '1.0', 
 
     # RTAB-Map's internal parameters are strings:
     'RGBD/ProximityMaxGraphDepth': '0',
@@ -109,7 +109,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
 
     'Mem/NotLinkedNodesKept': 'false',
     'Mem/STMSize': '60',
-
+    'Mem/DepthCompressionFormat': '.png',  # 将深度图压缩格式从RVL改为PNG
 
     'Reg/Force3DoF': force_3dof,
     'Reg/RepeatOnce': 'true',
