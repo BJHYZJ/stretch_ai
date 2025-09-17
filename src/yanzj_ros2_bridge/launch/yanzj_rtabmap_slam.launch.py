@@ -177,7 +177,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
           executable='rviz2',
           arguments=['-d', os.path.join(
             get_package_share_directory('yanzj_ros2_bridge'), 'rviz', 'rtabmap_vis.rviz')],
-          condition=IfCondition(LaunchConfiguration('rviz_use')))
+          condition=IfCondition(LaunchConfiguration('use_rviz')))
 
       ]
     )
@@ -206,8 +206,8 @@ def generate_launch_description():
       description='Use simulated clock.'),
     
     DeclareLaunchArgument(
-      'rviz_use', default_value='true',
-      description='Use rviz_use'),
+      'use_rviz', default_value='true',
+      description='Use rviz2'),
 
     DeclareLaunchArgument(
       'frame_id', default_value='base_footprint',
