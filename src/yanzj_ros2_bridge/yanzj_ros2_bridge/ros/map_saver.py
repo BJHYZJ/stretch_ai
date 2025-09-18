@@ -12,7 +12,7 @@ from geometry_msgs.msg import Pose2D
 from rclpy.node import Node
 from slam_toolbox.srv import DeserializePoseGraph, SerializePoseGraph
 
-from stretch.utils.memory import get_path_to_map
+from yanzj.utils.memory import get_path_to_map
 
 
 class MapSerializerDeserializer(Node):

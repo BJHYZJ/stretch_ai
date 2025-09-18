@@ -16,8 +16,8 @@ from typing import Optional, Tuple
 import numpy as np
 import trimesh.transformations as tra
 
-from stretch.motion.kinematics import HelloStretchIdx
-from stretch.motion.robot import RobotModel
+from yanzj.motion.kinematics import HelloStretchIdx
+from yanzj.motion.robot import RobotModel
 
 from .abstract import AbstractControlModule
 

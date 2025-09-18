@@ -19,7 +19,7 @@ import rclpy
 from rclpy.time import Time
 from sensor_msgs.msg import CameraInfo, Image
 
-from stretch.utils.image import Camera
+from yanzj.utils.image import Camera
 from yanzj_ros2_bridge.ros.msg_numpy import image_to_numpy
 
 

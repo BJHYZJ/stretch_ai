@@ -17,10 +17,10 @@ import numpy as np
 import rclpy
 from overrides import override
 
-import stretch.utils.compression as compression
-import stretch.utils.logger as logger
-from stretch.core.server import BaseZmqServer
-from stretch.utils.image import adjust_gamma, scale_camera_matrix
+import yanzj.utils.compression as compression
+import yanzj.utils.logger as logger
+from yanzj.core.server import BaseZmqServer
+from yanzj.utils.image import adjust_gamma, scale_camera_matrix
 from yanzj_ros2_bridge.remote import StretchClient
 from yanzj_ros2_bridge.ros.map_saver import MapSerializerDeserializer
 

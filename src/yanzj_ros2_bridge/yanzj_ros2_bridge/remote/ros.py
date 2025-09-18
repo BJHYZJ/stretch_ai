@@ -42,7 +42,7 @@ from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 from trajectory_msgs.msg import JointTrajectoryPoint
 
-from stretch.motion.constants import (
+from yanzj.motion.constants import (
     ROS_ARM_JOINTS,
     ROS_GRIPPER_FINGER,
     ROS_HEAD_PAN,
@@ -53,8 +53,8 @@ from stretch.motion.constants import (
     ROS_WRIST_YAW,
     STRETCH_HEAD_CAMERA_ROTATIONS,
 )
-from stretch.motion.kinematics import HelloStretchIdx
-from stretch.utils.pose import to_matrix, transform_to_list
+from yanzj.motion.kinematics import HelloStretchIdx
+from yanzj.utils.pose import to_matrix, transform_to_list
 from yanzj_ros2_bridge.constants import (
     CONFIG_TO_ROS,
     ROS_ARM_JOINTS,
@@ -157,7 +157,7 @@ class StretchRosInterface(Node):
 
         # Get fleet ID from environment
         fleet_id = os.environ["HELLO_FLEET_ID"]
-        # Parse from format stretch-reX-XX to just reX
+        # Parse from format yanzj-reX-XX to just reX
         robot_model = fleet_id.split("-")[1]
         print(f"Using fleet ID: {fleet_id}")
         print(f"Using robot model: {robot_model}")
@@ -417,7 +417,7 @@ class StretchRosInterface(Node):
 
         # Create command publishers
         self.goal_pub = self.create_publisher(Pose, "goto_controller/goal", 1)
-        self.velocity_pub = self.create_publisher(Twist, "stretch/cmd_vel", 1)
+        self.velocity_pub = self.create_publisher(Twist, "yanzj/cmd_vel", 1)
 
         self.grasp_ready = None
         self.grasp_complete = None
@@ -483,7 +483,7 @@ class StretchRosInterface(Node):
 
         self._joint_state_subscriber = self.create_subscription(
             JointState,
-            "stretch/joint_states",
+            "yanzj/joint_states",
             self._js_callback,
             100,
             callback_group=self._reentrant_cb,
@@ -596,7 +596,7 @@ class StretchRosInterface(Node):
             self._goal_reset_t = self.get_clock().now()
 
     def _mode_callback(self, msg):
-        """get position or navigation mode from stretch ros"""
+        """get position or navigation mode from yanzj ros"""
         self._current_mode = msg.data
 
     def _pose_graph_callback(self, msg):

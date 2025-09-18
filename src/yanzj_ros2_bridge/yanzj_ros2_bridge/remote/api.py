@@ -19,12 +19,12 @@ import numpy as np
 import torch
 import trimesh.transformations as tra
 
-from stretch.core.interfaces import Observations
-from stretch.core.robot import AbstractRobotClient, ControlMode
-from stretch.motion import RobotModel
-from stretch.motion.constants import STRETCH_NAVIGATION_Q, STRETCH_PREGRASP_Q
-from stretch.motion.kinematics import HelloStretchIdx, HelloStretchKinematics
-from stretch.utils.geometry import xyt2sophus
+from yanzj.core.interfaces import Observations
+from yanzj.core.robot import AbstractRobotClient, ControlMode
+from yanzj.motion import RobotModel
+from yanzj.motion.constants import STRETCH_NAVIGATION_Q, STRETCH_PREGRASP_Q
+from yanzj.motion.kinematics import HelloStretchIdx, HelloStretchKinematics
+from yanzj.utils.geometry import xyt2sophus
 
 from .modules.head import StretchHeadClient
 from .modules.manip import StretchManipulationClient
@@ -110,7 +110,7 @@ class StretchClient(AbstractRobotClient):
     # Mode interfaces
 
     def switch_to_navigation_mode(self):
-        """Switch stretch to navigation control
+        """Switch yanzj to navigation control
         Robot base is now controlled via continuous velocity feedback.
         """
         result_pre = True
@@ -133,7 +133,7 @@ class StretchClient(AbstractRobotClient):
         return True
 
     def switch_to_manipulation_mode(self):
-        """Switch stretch to manipulation control
+        """Switch yanzj to manipulation control
         Robot base is now controlled via position control.
         Base rotation is locked.
         """

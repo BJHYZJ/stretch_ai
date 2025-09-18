@@ -17,11 +17,11 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 from std_srvs.srv import Trigger
 
-import stretch.motion.conversions as conversions
-from stretch.motion.constants import STRETCH_HOME_Q
-from stretch.motion.kinematics import HelloStretchIdx
-from stretch.motion.robot import RobotModel
-from stretch.utils.geometry import pose_global_to_base_xyt, posquat2sophus, sophus2posquat
+import yanzj.motion.conversions as conversions
+from yanzj.motion.constants import STRETCH_HOME_Q
+from yanzj.motion.kinematics import HelloStretchIdx
+from yanzj.motion.robot import RobotModel
+from yanzj.utils.geometry import pose_global_to_base_xyt, posquat2sophus, sophus2posquat
 
 from .abstract import AbstractControlModule, enforce_enabled
 
@@ -34,7 +34,7 @@ JOINT_ANG_TOL = 0.05
 
 
 class StretchManipulationClient(AbstractControlModule):
-    """Manages stretch arm control and "manipulation mode" base motions (forward and backward)."""
+    """Manages yanzj arm control and "manipulation mode" base motions (forward and backward)."""
 
     def __init__(self, ros_client, robot_model: RobotModel):
         super().__init__()

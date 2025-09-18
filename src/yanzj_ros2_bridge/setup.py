@@ -35,7 +35,7 @@ setup(
             glob(os.path.join("urdf", "*.urdf")),
         ),
     ],
-    install_requires=["setuptools", "stretch"],
+    install_requires=["setuptools", "yanzj"],
     zip_safe=True,
     maintainer="hello-robot",
     maintainer_email="hello-robot@todo.todo",

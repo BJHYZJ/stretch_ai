@@ -10,10 +10,10 @@ git checkout cpaxton/ros2-migration
 HOME_ROBOT_ROOT=$(realpath robot-controller)
 
 # Install requirements
-cd $HOME_ROBOT_ROOT/src/stretch
+cd $HOME_ROBOT_ROOT/src/yanzj
 pip install -r requirements.txt
 
-# Install the core stretch package
+# Install the core yanzj package
 pip install -e .
 
 # Set up the python package for ROS

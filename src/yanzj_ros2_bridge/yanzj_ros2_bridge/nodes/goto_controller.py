@@ -27,9 +27,9 @@ from rclpy.time import Time
 from std_msgs.msg import Bool, Float32
 from std_srvs.srv import SetBool, Trigger
 
-from stretch.motion.control.goto_controller import GotoVelocityController
-from stretch.utils.config import get_control_config
-from stretch.utils.geometry import sophus2xyt
+from yanzj.motion.control.goto_controller import GotoVelocityController
+from yanzj.utils.config import get_control_config
+from yanzj.utils.geometry import sophus2xyt
 from yanzj_ros2_bridge.ros.utils import matrix_from_pose_msg
 from yanzj_ros2_bridge.ros.visualizer import Visualizer
 
@@ -223,7 +223,7 @@ class GotoVelocityControllerNode(Node):
     def create_pubs_subs_timers(self):
         """Publishers and Subscribers"""
 
-        self.vel_command_pub = self.create_publisher(Twist, "stretch/cmd_vel", 1)
+        self.vel_command_pub = self.create_publisher(Twist, "yanzj/cmd_vel", 1)
         self.at_goal_pub = self.create_publisher(Bool, "goto_controller/at_goal", 1)
 
         self.create_subscription(
